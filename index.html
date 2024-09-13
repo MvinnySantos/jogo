@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Adivinhação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f0f8ff;
+        }
+        header img {
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .message, .response {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            transition: font-size 0.2s ease;
+        }
+        button {
+            font-size: 1rem;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        .hidden {
+            display: none;
+        }
+        .question {
+            font-size: 2.25rem;
+            color: #333;
+            margin-top: 20px;
+        }
+        .message {
+            font-size: 2.25rem;
+            color: #ff69b4;
+            margin-top: 20px;
+        }
+        .heart-image, .love-video {
+            display: block;
+            margin: 20px auto;
+        }
+        .heart-image {
+            width: 100px;
+            max-width: 100px;
+            display: none;
+        }
+        .love-video {
+            width: 100%;
+            max-width: 600px;
+            display: none;
+        }
+        @media (max-width: 600px) {
+            .message, button {
+                font-size: 0.875rem;
+            }
+            button {
+                padding: 8px 16px;
+            }
+            .heart-image {
+                width: 80px;
+            }
+            .love-video {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="dog.jpeg" alt="Cachorrinho carinhoso" id="mainImage">
+    </header>
+    <main>
+        <div id="startPrompt" class="message">Você quer jogar um jogo?</div>
+        <button id="startYesButton" onclick="startGame('yes')">Sim</button>
+        <button id="startNoButton" onclick="startGame('no')">Não</button>
+
+        <!-- Perguntas do Jogo -->
+        <div id="questions">
+            <div id="question1" class="question hidden">Qual a data do nosso aniversário de namoro?</div>
+            <div id="options1" class="hidden">
+                <button onclick="handleAnswer('room', 'question1')">08/04</button>
+                <button onclick="handleAnswer('red', 'question1')">21/06</button>
+                <button onclick="handleAnswer('green', 'question1')">21/07</button>
+                <button onclick="handleAnswer('yellow', 'question1')">21/08</button>
+            </div>
+
+            <div id="question2" class="question hidden">Aonde foi nosso primeiro encontro?</div>
+            <div id="options2" class="hidden">
+                <button onclick="handleAnswer('beach', 'question2')">Praia</button>
+                <button onclick="handleAnswer('park', 'question2')">Parque</button>
+                <button onclick="handleAnswer('restaurant', 'question2')">Restaurante</button>
+                <button onclick="handleAnswer('cinema', 'question2')">Cinema</button>
+            </div>
+
+            <div id="question3" class="question hidden">Eu gosto mais de Doce ou Salgado?</div>
+            <div id="options3" class="hidden">
+                <button onclick="handleAnswer('salty', 'question3')">Salgado</button>
+                <button onclick="handleAnswer('sweet', 'question3')">Doce</button>
+            </div>
+
+            <div id="question4" class="question hidden">O que gostamos de fazer nos finais de semana?</div>
+            <div id="options4" class="hidden">
+                <button onclick="handleAnswer('home', 'question4')">Ficar em casa</button>
+                <button onclick="handleAnswer('travel', 'question4')">Shopping</button>
+                <button onclick="handleAnswer('dining', 'question4')">Almoçar fora</button>
+                <button onclick="handleAnswer('exercise', 'question4')">Exercitar</button>
+            </div>
+
+            <div id="question5" class="question hidden">Qual o nosso nome de carinho?</div>
+            <div id="options5" class="hidden">
+                <button onclick="handleAnswer('life', 'question5')">Vida</button>
+                <button onclick="handleAnswer('love', 'question5')">Amor</button>
+                <button onclick="handleAnswer('sweetie', 'question5')">Doce</button>
+                <button onclick="handleAnswer('honey', 'question5')">Mel</button>
+            </div>
+        </div>
+
+        <div id="correctMessage" class="message hidden">Você acertou! <br>Te amo</div>
+        <div id="incorrectMessage" class="message hidden">Resposta errada. Tente novamente!</div>
+
+        <img src="coracao.jpeg" alt="Coração" class="heart-image">
+        <video class="love-video" autoplay playsinline>
+            <source src="O Nosso Santo Bateu.mp4" type="video/mp4">
+            Seu navegador não suporta o elemento de vídeo.
+        </video>
+
+        <button id="restartButton" class="hidden" onclick="restartGame()">Reiniciar Jogo</button>
+    </main>
+    <script>
+        function startGame(response) {
+            if (response === 'yes') {
+                document.getElementById('startPrompt').classList.add('hidden');
+                document.getElementById('startYesButton').style.display = 'none';
+                document.getElementById('startNoButton').style.display = 'none';
+                resetGame();
+            } else {
+                document.getElementById('mainImage').src = 'cachorro_triste.jpeg';
+                document.getElementById('startPrompt').textContent = 'Que pena! Se mudar de ideia, volte para jogar!';
+                document.getElementById('startYesButton').style.display = 'none';
+                document.getElementById('startNoButton').style.display = 'none';
+                document.getElementById('restartButton').classList.add('hidden');
+            }
+        }
+
+        function handleAnswer(answer, questionId) {
+            const correctAnswers = {
+                'question1': 'yellow',
+                'question2': 'beach',
+                'question3': 'salty',
+                'question4': 'home',
+                'question5': 'life'
+            };
+
+            const correctAnswer = correctAnswers[questionId];
+            const correctMessage = document.getElementById('correctMessage');
+            const incorrectMessage = document.getElementById('incorrectMessage');
+            const heartImage = document.querySelector('.heart-image');
+            const loveVideo = document.querySelector('.love-video');
+            const restartButton = document.getElementById('restartButton');
+            const mainImage = document.getElementById('mainImage');
+
+            if (answer === correctAnswer) {
+                if (questionId === 'question5') {
+                    document.querySelectorAll('.question').forEach(question => question.classList.add('hidden'));
+                    document.querySelectorAll('#questions div[id^="options"]').forEach(options => options.classList.add('hidden'));
+                    correctMessage.classList.remove('hidden');
+                    heartImage.style.display = 'block';
+                    loveVideo.style.display = 'block';
+                    loveVideo.play().catch(error => console.error('Erro ao tentar reproduzir o vídeo:', error));
+                    mainImage.src = 'cachorro_feliz.jpg'; // Atualiza a imagem quando a última pergunta é acertada
+                    restartButton.classList.add('hidden');
+                } else {
+                    showNextQuestion(questionId);
+                }
+            } else {
+                showError();
+            }
+        }
+
+        function showNextQuestion(currentQuestionId) {
+            const nextQuestions = {
+                'question1': 'question2',
+                'question2': 'question3',
+                'question3': 'question4',
+                'question4': 'question5'
+            };
+
+            const nextQuestionId = nextQuestions[currentQuestionId];
+            if (nextQuestionId) {
+                document.getElementById(currentQuestionId).classList.add('hidden');
+                document.getElementById('options' + currentQuestionId.replace('question', '')).classList.add('hidden');
+                document.getElementById(nextQuestionId).classList.remove('hidden');
+                document.getElementById('options' + nextQuestionId.replace('question', '')).classList.remove('hidden');
+            }
+        }
+
+        function showError() {
+            document.getElementById('incorrectMessage').classList.remove('hidden');
+            document.querySelector('.heart-image').style.display = 'none';
+            document.querySelector('.love-video').style.display = 'none';
+            document.getElementById('restartButton').classList.add('hidden');
+            disableButtons();
+        }
+
+        function disableButtons() {
+            document.querySelectorAll('button').forEach(button => button.disabled = true);
+        }
+
+        function restartGame() {
+            resetGame();
+
+            document.getElementById('startPrompt').classList.remove('hidden');
+            document.getElementById('startYesButton').style.display = 'inline-block';
+            document.getElementById('startNoButton').style.display = 'inline-block';
+            document.getElementById('restartButton').classList.add('hidden');
+
+            document.querySelectorAll('.message').forEach(message => message.classList.add('hidden'));
+            document.querySelectorAll('#questions div[id^="options"]').forEach(options => options.classList.add('hidden'));
+            document.querySelectorAll('.question').forEach(question => question.classList.add('hidden'));
+            document.querySelectorAll('button').forEach(button => button.disabled = false);
+
+            document.getElementById('question1').classList.remove('hidden');
+            document.getElementById('options1').classList.remove('hidden');
+        }
+
+        function resetGame() {
+            document.querySelectorAll('.question').forEach(question => question.classList.add('hidden'));
+            document.querySelectorAll('#questions div[id^="options"]').forEach(options => options.classList.add('hidden'));
+            document.querySelector('.heart-image').style.display = 'none';
+            document.querySelector('.love-video').style.display = 'none';
+            document.getElementById('correctMessage').classList.add('hidden');
+            document.getElementById('incorrectMessage').classList.add('hidden');
+            document.getElementById('restartButton').classList.add('hidden');
+            document.querySelectorAll('button').forEach(button => button.disabled = false);
+
+            document.getElementById('question1').classList.remove('hidden');
+            document.getElementById('options1').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
